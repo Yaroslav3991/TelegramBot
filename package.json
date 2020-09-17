@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Yaroslav3991/TelegramBot/issues"
   },
-  "homepage": "https://github.com/Yaroslav3991/TelegramBot#readme"
+  "homepage": "https://github.com/Yaroslav3991/TelegramBot#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.50.0"
+  }
 }
