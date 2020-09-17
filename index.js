@@ -39,6 +39,8 @@ bot.on("message", (msg) => {
   //     text: '123'
   //   }
 
+  console.log(msg);
+
   // send a message to the chat acknowledging receipt of their message
   bot.sendMessage(
     userId,
