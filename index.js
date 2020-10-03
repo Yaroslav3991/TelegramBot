@@ -1,8 +1,33 @@
 const TelegramBot = require("node-telegram-bot-api");
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const token = "1209199757:AAHc9IzOLpWYVow006lIOIcGPiWOIhcTCIQ";
-
 const bot = new TelegramBot(token, { polling: true });
+
+let valute = {};
+
+const getJSON = function (url, callback) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.responseType = "json";
+  xhr.onload = function () {
+    let status = xhr.status;
+    if (status === 200) {
+      callback(null, xhr.responseText);
+    } else {
+      callback(status, xhr.response);
+    }
+  };
+  xhr.send();
+};
+
+getJSON("https://www.cbr-xml-daily.ru/daily_json.js", function (err, data) {
+  if (err !== null) {
+    console.log("Something went wrong: " + err);
+  } else {
+    valute = JSON.parse(data);
+  }
+});
 
 bot.onText(/\/echo (.+)/, (msg, match) => {
   const userId = msg.chat.id;
@@ -11,47 +36,45 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   bot.sendMessage(userId, resp);
 });
 
-// Listen for any kind of message. There are different kinds of
-// messages.
+bot.onText(/\/rates (.+)/, (msg, match) => {
+  const userId = msg.chat.id;
+  const resp = match[1].toLocaleUpperCase();
+
+  if (valute.Valute[resp]) {
+    let value = valute.Valute[resp];
+
+    bot.sendMessage(
+      userId,
+      `${value.Nominal} ${value.Name} -> ${value.Value}  Рублей`
+    );
+
+    bot.sendSticker(
+      userId,
+      value.Value > value.Previous
+        ? "CAACAgIAAxkBAANuX3hxjDeJ1bjY_ERFn40u19XQOZgAAnAGAAJjK-IJTIAfOTr1S-EbBA"
+        : "CAACAgIAAxkBAANxX3hxjweGDD2Jeg50qSceUhg19twAAnEGAAJjK-IJ8vPDFfpRp_kbBA"
+    );
+  } else {
+    bot.sendMessage(userId, "Не могу найти валюту " + resp);
+  }
+});
+
 bot.on("message", (msg) => {
   const userId = msg.chat.id;
   const chatId = msg.chat.id;
 
-  // msg object
-  //   {
-  //     message_id: 10,
-  //     from: {
-  //       id: 803239764,
-  //       is_bot: false,
-  //       first_name: 'Perfect',
-  //       last_name: 'Nightmare',
-  //       username: 'Legato3991',
-  //       language_code: 'ru'
-  //     },
-  //     chat: {
-  //       id: 803239764,
-  //       first_name: 'Perfect',
-  //       last_name: 'Nightmare',
-  //       username: 'Legato3991',
-  //       type: 'private'
-  //     },
-  //     date: 1600379792,
-  //     text: '123'
-  //   }
-
   console.log(msg);
 
-  // send a message to the chat acknowledging receipt of their message
-  bot.sendMessage(
-    userId,
-    msg.from.first_name + " " + msg.from.last_name + " I am busy, sorry"
-  );
+  // bot.sendMessage(
+  //   userId,
+  //   msg.from.first_name + " " + msg.from.last_name + " I am busy, sorry"
+  // );
 
-//   bot.sendLocation(
-//     (chat_id = chatId),
-//     (latitude = 51.521727),
-//     (longitude = -0.117255)
-//   );
+  //   bot.sendLocation(
+  //     (chat_id = chatId),
+  //     (latitude = 51.521727),
+  //     (longitude = -0.117255)
+  //   );
 
-  bot.sendSticker(chatId, "CAADAgADOQADfyesDlKEqOOd72VKAg")
+  // bot.sendSticker(chatId, "CAADAgADOQADfyesDlKEqOOd72VKAg")
 });
