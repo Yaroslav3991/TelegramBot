@@ -1,7 +1,11 @@
 const TelegramBot = require("node-telegram-bot-api");
+const axios = require("axios");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const token = "1209199757:AAHc9IzOLpWYVow006lIOIcGPiWOIhcTCIQ";
+const apiCryptoCompareKey =
+  "da070e2781369c2446227b7e2cf515cdee789f3d853e03569f40c608492471dd";
+
 const bot = new TelegramBot(token, { polling: true });
 
 let valute = {};
@@ -59,22 +63,35 @@ bot.onText(/\/rates (.+)/, (msg, match) => {
   }
 });
 
-bot.on("message", (msg) => {
+bot.onText(/\/crypto (.+)/, async (msg, match) => {
   const userId = msg.chat.id;
-  const chatId = msg.chat.id;
+  const type = match[1].toLocaleUpperCase();
 
+  try {
+    let res = await axios.get(
+      `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${type}&tsyms=USD&api_key=${apiCryptoCompareKey}`
+    );
+    let data = res.data.DISPLAY[type].USD;
+
+    console.log(data);
+    let message = `
+Name: ${type}
+Symbol: ${data.FROMSYMBOL}
+Price: ${data.PRICE}
+Open: ${data.OPENDAY}
+High: ${data.HIGHDAY}
+Low: ${data.LOWDAY}
+Supply: ${data.SUPPLY}
+Market Cap: ${data.MKTCAP}
+`;
+
+    bot.sendMessage(userId, message);
+  } catch (err) {
+    console.log(err);
+    bot.sendMessage(userId, "Error, try again later");
+  }
+});
+
+bot.on("message", (msg) => {
   console.log(msg);
-
-  // bot.sendMessage(
-  //   userId,
-  //   msg.from.first_name + " " + msg.from.last_name + " I am busy, sorry"
-  // );
-
-  //   bot.sendLocation(
-  //     (chat_id = chatId),
-  //     (latitude = 51.521727),
-  //     (longitude = -0.117255)
-  //   );
-
-  // bot.sendSticker(chatId, "CAADAgADOQADfyesDlKEqOOd72VKAg")
 });
