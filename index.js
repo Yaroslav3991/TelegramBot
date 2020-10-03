@@ -33,14 +33,48 @@ getJSON("https://www.cbr-xml-daily.ru/daily_json.js", function (err, data) {
   }
 });
 
-bot.onText(/\/echo (.+)/, (msg, match) => {
+let helpMessage = `
+I can't do much yet, but here's what I can
+
+1. Find out the exchange rate against the ruble
+/rates "short currency name"
+
+Example
+/rates usd
+
+2. Find out the cost of cryptocurrency in dollars
+/crypto "short cryptocurrency name"
+
+Example
+/crypto btc
+`;
+
+bot.onText(/\/start/i, (msg, match) => {
+  const userId = msg.chat.id;
+
+  bot.sendMessage(userId, "Greetings traveler! " + helpMessage);
+});
+
+bot.onText(/\/help/i, (msg, match) => {
+  const userId = msg.chat.id;
+
+  bot.sendMessage(userId, helpMessage);
+});
+
+bot.onText(/help/i, (msg, match) => {
+  const userId = msg.chat.id;
+
+  bot.sendMessage(userId, helpMessage);
+});
+
+bot.onText(/\/echo (.+)/i, (msg, match) => {
   const userId = msg.chat.id;
   const resp = match[1];
 
   bot.sendMessage(userId, resp);
 });
 
-bot.onText(/\/rates (.+)/, (msg, match) => {
+bot.onText(/\/rates (.+)/i, (msg, match) => {
   const userId = msg.chat.id;
   const resp = match[1].toLocaleUpperCase();
 
@@ -63,7 +97,7 @@ bot.onText(/\/rates (.+)/, (msg, match) => {
   }
 });
 
-bot.onText(/\/crypto (.+)/, async (msg, match) => {
+bot.onText(/\/crypto (.+)/i, async (msg, match) => {
   const userId = msg.chat.id;
   const type = match[1].toLocaleUpperCase();
 
