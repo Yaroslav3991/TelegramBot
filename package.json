@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Yaroslav3991/TelegramBot#readme",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "node-telegram-bot-api": "^0.50.0",
     "xmlhttprequest": "^1.8.0"
   }
